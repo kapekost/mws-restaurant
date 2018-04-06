@@ -74,9 +74,9 @@ fillRestaurantHTML = (restaurant = this.restaurant) => {
     sourceSmall.setAttribute('media', '(max-width:700px)')
     sourceSmall.setAttribute('srcset',
       imageRepresentations.small_1x
-      .concat(' 1x,')
-      .concat(imageRepresentations.small_2x)
-      .concat(' 2x')
+        .concat(' 1x,')
+        .concat(imageRepresentations.small_2x)
+        .concat(' 2x')
     );
     picture.append(sourceSmall);
 
@@ -84,9 +84,9 @@ fillRestaurantHTML = (restaurant = this.restaurant) => {
     sourceLarge.setAttribute('media', '(min-width:701px)')
     sourceLarge.setAttribute('srcset',
       imageRepresentations.large_1x
-      .concat(' 1x,')
-      .concat(imageRepresentations.large_2x)
-      .concat(' 2x')
+        .concat(' 1x,')
+        .concat(imageRepresentations.large_2x)
+        .concat(' 2x')
     );
     picture.append(sourceLarge);
 
@@ -111,6 +111,7 @@ fillRestaurantHTML = (restaurant = this.restaurant) => {
   }
   // fill reviews
   fillReviewsHTML();
+  fillSubmitReviewsHTML();
 }
 
 /**
@@ -153,6 +154,37 @@ fillReviewsHTML = (reviews = this.restaurant.reviews) => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
+}
+
+/**
+ * Create submit reviews HTML and add them to the webpage.
+ */
+fillSubmitReviewsHTML = () => {
+  const container = document.getElementById('reviews-submit-container');
+  const title = document.createElement('h2');
+  title.innerHTML = 'Submit Review';
+  container.appendChild(title);
+
+
+  const username = document.createElement('input');
+  username.setAttribute('type', 'text');
+  username.setAttribute('name', 'username');
+  username.setAttribute('placeholder', 'username');
+  container.appendChild(username);
+
+  const rating = document.createElement('input');
+  rating.setAttribute('type', 'number');
+  rating.setAttribute('min', 0);
+  rating.setAttribute('max', 5);
+  rating.setAttribute('name', 'rating');
+  rating.setAttribute('placeholder', 'username');
+  container.appendChild(rating);
+
+  const restaurant_id = document.createElement('input');
+  restaurant_id.setAttribute('type', 'hidden');
+  restaurant_id.setAttribute('name', 'id');
+  restaurant_id.setAttribute('value', this.restaurant);
+  container.appendChild(restaurant_id);
 }
 
 /**

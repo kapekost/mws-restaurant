@@ -902,6 +902,6 @@ addMarkersToMap = (restaurants = _this.restaurants) => {
   });
 };
 
-},{"./dbhelper":2}]},{},[4]);
+},{"./dbhelper":2}]},{},[4])
 
 //# sourceMappingURL=bundle_main.js.map

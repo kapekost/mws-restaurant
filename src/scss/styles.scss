@@ -382,6 +382,12 @@
 	#restaurant-hours td {
 		color: #666;
 	}
+
+	#reviews-submit-container{
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+	}
 	/* ====================== Breakpoints ====================== */
 
 	@media screen and (min-width:700px) {
