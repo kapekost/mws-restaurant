@@ -24,6 +24,13 @@ Student Project - Restaurant Reviews_
 export MAPS_API_KEY="your key"
 ```
 
+### Install dependencies
+
+```shell
+npm i gulp -g
+brew install imagemagick
+```
+
 ### Start development mode (listen for changes and serve the project)
 
 ```shell
@@ -38,7 +45,7 @@ npm i
 gulp
 ```
 
-point your browser to : <http://localhost:8001>
+point your browser to : <http://localhost:8000/>
 
 ## Build and listen for the production version
 
@@ -47,4 +54,4 @@ npm i
 gulp --production
 ```
 
-point your browser to : <http://localhost:8001>
+point your browser to : <http://localhost:8000/>
