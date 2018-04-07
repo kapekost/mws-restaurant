@@ -1,5 +1,5 @@
 const DBHelper = require('./dbhelper');
-
+const ReviewsHandler = require('./reviews_handler');
 let restaurant;
 var map;
 
