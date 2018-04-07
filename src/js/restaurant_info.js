@@ -168,6 +168,7 @@ fillSubmitReviewsHTML = () => {
 
   const username = document.createElement('input');
   username.setAttribute('type', 'text');
+  username.setAttribute('id', 'username');
   username.setAttribute('name', 'username');
   username.setAttribute('placeholder', 'username');
   container.appendChild(username);
@@ -176,9 +177,20 @@ fillSubmitReviewsHTML = () => {
   rating.setAttribute('type', 'number');
   rating.setAttribute('min', 0);
   rating.setAttribute('max', 5);
+  rating.setAttribute('id', 'rating');
   rating.setAttribute('name', 'rating');
   rating.setAttribute('placeholder', 'username');
   container.appendChild(rating);
+
+  const comments_area = document.createElement('textarea');
+  comments_area.setAttribute('id', 'comments');
+  comments_area.setAttribute('name', 'comments');
+  container.appendChild(comments_area);
+
+  const submit_btn = document.createElement('button');
+  submit_btn.setAttribute('id', 'submit');
+  submit_btn.innerText = 'submit';
+  container.appendChild(submit_btn);
 
   const restaurant_id = document.createElement('input');
   restaurant_id.setAttribute('type', 'hidden');
