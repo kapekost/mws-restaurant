@@ -166,37 +166,50 @@ fillSubmitReviewsHTML = () => {
   container.appendChild(title);
 
 
-  const username = document.createElement('input');
-  username.setAttribute('type', 'text');
-  username.setAttribute('id', 'username');
-  username.setAttribute('name', 'username');
-  username.setAttribute('placeholder', 'username');
-  container.appendChild(username);
+  const username_element = document.createElement('input');
+  username_element.setAttribute('type', 'text');
+  username_element.setAttribute('id', 'name');
+  username_element.setAttribute('name', 'name');
+  username_element.setAttribute('placeholder', 'name');
+  container.appendChild(username_element);
 
-  const rating = document.createElement('input');
-  rating.setAttribute('type', 'number');
-  rating.setAttribute('min', 0);
-  rating.setAttribute('max', 5);
-  rating.setAttribute('id', 'rating');
-  rating.setAttribute('name', 'rating');
-  rating.setAttribute('placeholder', 'username');
-  container.appendChild(rating);
+  const rating_element = document.createElement('input');
+  rating_element.setAttribute('type', 'number');
+  rating_element.setAttribute('min', 0);
+  rating_element.setAttribute('max', 5);
+  rating_element.setAttribute('id', 'rating');
+  rating_element.setAttribute('name', 'rating');
+  rating_element.setAttribute('placeholder', 'username');
+  container.appendChild(rating_element);
 
   const comments_area = document.createElement('textarea');
   comments_area.setAttribute('id', 'comments');
   comments_area.setAttribute('name', 'comments');
   container.appendChild(comments_area);
 
+  const restaurant_id_element = document.createElement('input');
+  restaurant_id_element.setAttribute('type', 'hidden');
+  restaurant_id_element.setAttribute('name', 'id');
+  restaurant_id_element.setAttribute('value', this.restaurant.id);
+  container.appendChild(restaurant_id_element);
+
   const submit_btn = document.createElement('button');
   submit_btn.setAttribute('id', 'submit');
   submit_btn.innerText = 'submit';
+  submit_btn.addEventListener("click", () => {
+    const review = {
+      name: username_element.value,
+      rating: rating_element.value,
+      comments: comments_area.value,
+      restaurant_id: restaurant_id_element.value
+    };
+    if (review.name && review.rating && review.comments && review.restaurant_id) {
+      ReviewsHandler.addReview(review);
+    }
+  });
+
   container.appendChild(submit_btn);
 
-  const restaurant_id = document.createElement('input');
-  restaurant_id.setAttribute('type', 'hidden');
-  restaurant_id.setAttribute('name', 'id');
-  restaurant_id.setAttribute('value', this.restaurant);
-  container.appendChild(restaurant_id);
 }
 
 /**
@@ -204,7 +217,7 @@ fillSubmitReviewsHTML = () => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
-  const name = document.createElement('p');
+  const name = document.createElement('h3');
   name.innerHTML = review.name;
   li.appendChild(name);
 
