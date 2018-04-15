@@ -4868,22 +4868,22 @@ class DBHelper {
         // Got a success response from server!
         const restaurants = JSON.parse(xhr.responseText);
         const imageData = ImageInfo.ImageInfoData;
-        //TODO line up promises to fetch per restaurant
-        // ReviewsHandler.fetchReviews().then((reviews) => {
         restaurants.map(function (restaurant) {
           if (restaurant.photograph) {
             restaurant.alt = imageData[restaurant.photograph].alt;
             restaurant.caption = imageData[restaurant.photograph].caption;
           }
-          self.dbPromise.then(function (db) {
-            var tx = db.transaction('restaurants', 'readwrite');
-            var restaurantStore = tx.objectStore('restaurants');
-            return restaurantStore.put(restaurant);
+          ReviewsHandler.fetchReviewsByRestaurantId(restaurant.id).then(reviews => {
+            restaurant.reviews = reviews;
+            self.dbPromise.then(function (db) {
+              var tx = db.transaction('restaurants', 'readwrite');
+              var restaurantStore = tx.objectStore('restaurants');
+              return restaurantStore.put(restaurant);
+            });
           });
           return restaurant;
+          callback(null, restaurants);
         });
-        callback(null, restaurants);
-        // });
       } else {
         // Oops!. Got an error from server.
         this.dbPromise.then(() => {
@@ -5109,7 +5109,6 @@ class DBHelper {
     });
     return marker;
   }
-
 }
 module.exports = DBHelper;
 
@@ -5193,6 +5192,8 @@ var _this = this;
 
 const DBHelper = require('./dbhelper');
 const ReviewsHandler = require('./reviews_handler');
+const moment = require('moment');
+
 let restaurant;
 var map;
 
@@ -5357,14 +5358,10 @@ fillSubmitReviewsHTML = () => {
   username_element.setAttribute('placeholder', 'name');
   container.appendChild(username_element);
 
-  const rating_element = document.createElement('input');
-  rating_element.setAttribute('type', 'number');
-  rating_element.setAttribute('min', 0);
-  rating_element.setAttribute('max', 5);
-  rating_element.setAttribute('id', 'rating');
-  rating_element.setAttribute('name', 'rating');
-  rating_element.setAttribute('placeholder', 'username');
-  container.appendChild(rating_element);
+  const rating_start_elem = document.createElement('p');
+  rating_start_elem.innerHTML = getStarRatingTemplate();
+
+  container.appendChild(rating_start_elem);
 
   const comments_area = document.createElement('textarea');
   comments_area.setAttribute('id', 'comments');
@@ -5381,14 +5378,30 @@ fillSubmitReviewsHTML = () => {
   submit_btn.setAttribute('id', 'submit');
   submit_btn.innerText = 'submit';
   submit_btn.addEventListener("click", () => {
+
+    const getRating = function () {
+      const rating_radios = document.getElementsByName('rating_radio');
+      for (radio of rating_radios) {
+        if (radio.checked) {
+          {
+            return radio.value;
+          }
+        }
+      }
+      return 0;
+    };
     const review = {
       name: username_element.value,
-      rating: rating_element.value,
+      rating: getRating(),
       comments: comments_area.value,
       restaurant_id: restaurant_id_element.value
     };
     if (review.name && review.rating && review.comments && review.restaurant_id) {
-      ReviewsHandler.addReview(review);
+      ReviewsHandler.addReview(review).then(() => {
+        const ul = document.getElementById('reviews-list');
+        review.date = moment();
+        ul.appendChild(createReviewHTML(review));
+      });
     }
   });
 
@@ -5447,7 +5460,25 @@ getParameterByName = (name, url) => {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
 
-},{"./dbhelper":3,"./reviews_handler":6}],6:[function(require,module,exports){
+/**
+ * Get the HTML template of star rating.
+ */
+getStarRatingTemplate = () => {
+  return `<fieldset class="rating" id="rating_value">
+  <input type="radio" id="star5" name="rating_radio" value="5" /><label class = "full" for="star5" title="Awesome - 5 stars"></label>
+  <input type="radio" id="star4half" name="rating_radio" value="4.5" /><label class="half" for="star4half" title="Pretty good - 4.5 stars"></label>
+  <input type="radio" id="star4" name="rating_radio" value="4" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
+  <input type="radio" id="star3half" name="rating_radio" value="3.5" /><label class="half" for="star3half" title="Meh - 3.5 stars"></label>
+  <input type="radio" id="star3" name="rating_radio" value="3" /><label class = "full" for="star3" title="Meh - 3 stars"></label>
+  <input type="radio" id="star2half" name="rating_radio" value="2.5" /><label class="half" for="star2half" title="Kinda bad - 2.5 stars"></label>
+  <input type="radio" id="star2" name="rating_radio" value="2" /><label class = "full" for="star2" title="Kinda bad - 2 stars"></label>
+  <input type="radio" id="star1half" name="rating_radio" value="1.5" /><label class="half" for="star1half" title="Meh - 1.5 stars"></label>
+  <input type="radio" id="star1" name="rating_radio" value="1" /><label class = "full" for="star1" title="Sucks big time - 1 star"></label>
+  <input type="radio" id="starhalf" name="rating_radio" value="0.5" /><label class="half" for="starhalf" title="Sucks big time - 0.5 stars"></label>
+</fieldset>`;
+};
+
+},{"./dbhelper":3,"./reviews_handler":6,"moment":2}],6:[function(require,module,exports){
 /**
  * Manage reviews class.
  */
@@ -5524,25 +5555,18 @@ class ReviewsHandler {
      * Fetch reviews by restaurant id.
      */
     static addReview(review) {
-        const params = {
-            "restaurant_id": review.restaurant_id,
-            "name": review.name,
-            "rating": review.rating,
-            "comments": review.comments
-        };
+        const params = `restaurant_id=${review.restaurant_id}
+            &name=${review.name}
+            &rating=${review.rating}
+            &comments=${review.comments}`;
+
         return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
             xhr.open('POST', ReviewsHandler.REVIEWS_URL);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = () => {
-                if (xhr.status === 201) {
-                    // Got a success response from server!
-                    resolve();
-                    console.log("submitted succesfully:" + params);
-                } else {
-                    // Oops!. Got an error from server.
-                    const error = `Request failed.`;
-                    reject(error);
-                }
+                resolve();
+                console.log("submitted succesfully:", params);
             };
             xhr.onerror = error => {
                 console.log(error);

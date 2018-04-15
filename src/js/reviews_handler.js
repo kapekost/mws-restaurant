@@ -70,23 +70,19 @@ class ReviewsHandler {
      * Fetch reviews by restaurant id.
      */
     static addReview(review) {
-        const params = {
-            "restaurant_id": review.restaurant_id,
-            "name": review.name,
-            "rating": review.rating,
-            "comments": review.comments
-        }
+        const params =
+            `restaurant_id=${review.restaurant_id}
+            &name=${review.name}
+            &rating=${review.rating}
+            &comments=${review.comments}`
+
         return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
             xhr.open('POST', ReviewsHandler.REVIEWS_URL);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
             xhr.onload = () => {
-                if (xhr.status === 201) { // Got a success response from server!
-                    resolve();
-                    console.log("submitted succesfully:" + params);
-                } else { // Oops!. Got an error from server.
-                    const error = (`Request failed.`);
-                    reject(error);
-                }
+                resolve();
+                console.log("submitted succesfully:", params);
             };
             xhr.onerror = (error) => {
                 console.log(error);

@@ -45,22 +45,22 @@ class DBHelper {
       if (xhr.status === 200) { // Got a success response from server!
         const restaurants = JSON.parse(xhr.responseText);
         const imageData = ImageInfo.ImageInfoData;
-        //TODO line up promises to fetch per restaurant
-        // ReviewsHandler.fetchReviews().then((reviews) => {
         restaurants.map(function (restaurant) {
           if (restaurant.photograph) {
             restaurant.alt = imageData[restaurant.photograph].alt;
             restaurant.caption = imageData[restaurant.photograph].caption;
           }
-          self.dbPromise.then(function (db) {
-            var tx = db.transaction('restaurants', 'readwrite');
-            var restaurantStore = tx.objectStore('restaurants');
-            return restaurantStore.put(restaurant);
+          ReviewsHandler.fetchReviewsByRestaurantId(restaurant.id).then((reviews) => {
+            restaurant.reviews = reviews;
+            self.dbPromise.then(function (db) {
+              var tx = db.transaction('restaurants', 'readwrite');
+              var restaurantStore = tx.objectStore('restaurants');
+              return restaurantStore.put(restaurant);
+            });
           });
           return restaurant;
+          callback(null, restaurants);
         });
-        callback(null, restaurants);
-        // });
       } else { // Oops!. Got an error from server.
         this.dbPromise.then(() => {
           return DBHelper.fetchRestaurantsFromStorage()
@@ -281,6 +281,5 @@ class DBHelper {
     });
     return marker;
   }
-
 }
 module.exports = DBHelper;
