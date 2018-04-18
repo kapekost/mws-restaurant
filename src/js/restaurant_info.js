@@ -163,27 +163,51 @@ fillReviewsHTML = (reviews = this.restaurant.reviews) => {
  */
 fillSubmitReviewsHTML = () => {
   const container = document.getElementById('reviews-submit-container');
+  const ul = document.createElement('ul');
+  ul.setAttribute('class', 'review-wrapper');
+
+  const li = document.createElement('li');
   const title = document.createElement('h2');
   title.innerHTML = 'Submit Review';
-  container.appendChild(title);
+  li.appendChild(title);
+  ul.appendChild(li);
 
-
+  const li2 = document.createElement('li');
+  li2.setAttribute('class', 'review-row');
+  const username_label_element = document.createElement('label');
+  username_label_element.setAttribute('for', 'name');
+  username_label_element.innerText = 'Name:'
   const username_element = document.createElement('input');
   username_element.setAttribute('type', 'text');
   username_element.setAttribute('id', 'name');
   username_element.setAttribute('name', 'name');
-  username_element.setAttribute('placeholder', 'name');
-  container.appendChild(username_element);
+  username_element.setAttribute('placeholder', 'enter your name');
+  li2.appendChild(username_label_element);
+  li2.appendChild(username_element);
+  ul.appendChild(li2);
 
+  const li3 = document.createElement('li');
+  li3.setAttribute('class', 'review-row');
+  const rating_start_label_element = document.createElement('label');
+  rating_start_label_element.setAttribute('for', 'rating_value');
+  rating_start_label_element.innerText = 'Rating:'
   const rating_start_elem = document.createElement('p');
   rating_start_elem.innerHTML = getStarRatingTemplate();
+  li3.appendChild(rating_start_label_element);
+  li3.appendChild(rating_start_elem);
+  ul.appendChild(li3);
 
-  container.appendChild(rating_start_elem);
-
+  const li4 = document.createElement('li');
+  li4.setAttribute('class', 'review-row');
+  const comments_area_label_element = document.createElement('label');
+  comments_area_label_element.setAttribute('for', 'comments');
+  comments_area_label_element.innerText = 'Comments:'
   const comments_area = document.createElement('textarea');
   comments_area.setAttribute('id', 'comments');
   comments_area.setAttribute('name', 'comments');
-  container.appendChild(comments_area);
+  li4.appendChild(comments_area_label_element);
+  li4.appendChild(comments_area);
+  ul.appendChild(li4);
 
   const restaurant_id_element = document.createElement('input');
   restaurant_id_element.setAttribute('type', 'hidden');
@@ -191,6 +215,8 @@ fillSubmitReviewsHTML = () => {
   restaurant_id_element.setAttribute('value', this.restaurant.id);
   container.appendChild(restaurant_id_element);
 
+  const li5 = document.createElement('li');
+  li5.setAttribute('class', 'review-row');
   const submit_btn = document.createElement('button');
   submit_btn.setAttribute('id', 'submit');
   submit_btn.innerText = 'submit';
@@ -219,11 +245,13 @@ fillSubmitReviewsHTML = () => {
         review.date = moment();
         ul.appendChild(createReviewHTML(review));
       });
+    } else {
+      alert('please fill in all the fields');
     }
   });
-
-  container.appendChild(submit_btn);
-
+  li5.appendChild(submit_btn);
+  ul.appendChild(li5);
+  container.appendChild(ul);
 }
 
 /**
