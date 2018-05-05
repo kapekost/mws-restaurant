@@ -239,11 +239,15 @@ fillSubmitReviewsHTML = () => {
       comments: comments_area.value,
       restaurant_id: restaurant_id_element.value
     };
+    review.date = moment();
+    const ul = document.getElementById('reviews-list');
+
     if (review.name && review.rating && review.comments && review.restaurant_id) {
       ReviewsHandler.addReview(review).then(() => {
-        const ul = document.getElementById('reviews-list');
-        review.date = moment();
         ul.appendChild(createReviewHTML(review));
+      }).catch(() => {
+        const pending = true;
+        ul.appendChild(createReviewHTML(review, pending));
       });
     } else {
       alert('please fill in all the fields');
@@ -257,8 +261,15 @@ fillSubmitReviewsHTML = () => {
 /**
  * Create review HTML and add it to the webpage.
  */
-createReviewHTML = (review) => {
+createReviewHTML = (review, pending) => {
   const li = document.createElement('li');
+
+  if (pending) {
+    const pendingElement = document.createElement('p');
+    pendingElement.innerHTML = 'pending...';
+    li.appendChild(pendingElement);
+  }
+
   const name = document.createElement('h3');
   name.innerHTML = review.name;
   li.appendChild(name);

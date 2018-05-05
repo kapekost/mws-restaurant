@@ -88,7 +88,12 @@ class ReviewsHandler {
                 console.log(error);
                 reject(error);
             }
-            xhr.send(params);
+            try {
+                xhr.send(params);
+            }
+            catch (error) {
+                reject(error);
+            }
         });
     }
 }
